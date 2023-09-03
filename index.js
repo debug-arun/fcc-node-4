@@ -113,8 +113,8 @@ app.get('/api/users/:_id/logs', (req, res) => {
       data = {
         _id,
         username: data.username,
-        from: parsedQuery.from,
-        to: parsedQuery.to,
+        from: dateFormat(from),
+        to: dateFormat(to),
         count: data.log.length
       }
       res.status(200).json(data)
