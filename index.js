@@ -79,7 +79,7 @@ app.post('/api/users/:_id/exercises', (req, res) => {
   Log.findOne({_id}).then(data => {
     data.log.push({
       duration,
-      date: dateString, 
+      date,
       description,
     });
     data.count++;
@@ -100,25 +100,36 @@ app.post('/api/users/:_id/exercises', (req, res) => {
 app.get('/api/users/:_id/logs', (req, res) => {
   const _id = req.params._id;
   const parsedQuery = req.query;
-  console.log(parsedQuery);
+  console.log("Parsed query: ", parsedQuery);
   Log.findById(_id).then(data => {
-    if(parsedQuery.from) {
+    if(parsedQuery.from || parsedQuery.to || parsedQuery.limit) {
       const from = parsedQuery.from, 
       to = parsedQuery.to, limit = parsedQuery.limit;
-      console.log(from, dateFormat(new Date()), to)
-      data.log = data.log.filter((log) => {
-        let logDate = dateFormat(new Date(log.date));
-        return (from <= logDate) && (logDate <= to);
-      }).slice(0, limit);
-      data = {
+      let dataToSend = {}
+      if(from){
+        data.log = data.log.filter((log) => {
+          return (from <= log.date);
+        });
+        dataToSend.from = new Date(from).toDateString();
+      } 
+      if(to) {
+        data.log = data.log.filter((log) => {
+          return (log.date <= to);
+        });
+        dataToSend['to'] = new Date(to).toDateString();
+      }
+      if(limit) {
+        data.log = data.log.slice(0, limit);
+      }
+      dataToSend['count'] = data.log.length;
+      dataToSend = {
         _id,
         username: data.username,
-        from: new Date(from).toDateString(),
-        to: new Date(to).toDateString(),
-        count: data.log.length,
-        log: data.log
+        log: data.log,
+        ...dataToSend
       }
-      res.status(200).json(data)
+      console.log(dataToSend);
+      res.status(200).json(dataToSend);
     } else 
       res.status(200).json(data);
   }).catch(err => {
