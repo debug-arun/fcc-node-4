@@ -113,9 +113,9 @@ app.get('/api/users/:_id/logs', (req, res) => {
       data = {
         _id,
         username: data.username,
-        from: dateFormat(from),
-        to: dateFormat(to),
-        limit: data.log.length,
+        from: from.toDateString(),
+        to: to.toDateString(),
+        count: data.log.length,
         log: data.log
       }
       res.status(200).json(data)
