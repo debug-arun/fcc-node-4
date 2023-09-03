@@ -71,7 +71,7 @@ app.get('/api/users', (req, res) => {
 
 app.post('/api/users/:_id/exercises', (req, res) => {
   const _id = req.params._id;
-  const duration = req.body.duration, description = req.body.description;
+  const duration = parseInt(req.body.duration), description = req.body.description;
   let date = new Date();
   if(req.body.date) 
     date = new Date(req.body.date);
@@ -100,8 +100,9 @@ app.post('/api/users/:_id/exercises', (req, res) => {
 app.get('/api/users/:_id/logs', (req, res) => {
   const _id = req.params._id;
   const parsedQuery = req.query;
+  console.log(parsedQuery);
   Log.findById(_id).then(data => {
-    if(parsedQuery) {
+    if(parsedQuery.from) {
       const from = new Date(parsedQuery.from), 
       to = new Date(parsedQuery.to), limit = parsedQuery.limit;
       console.log(dateFormat(from), dateFormat(new Date()), dateFormat(to))
