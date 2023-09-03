@@ -79,7 +79,7 @@ app.post('/api/users/:_id/exercises', (req, res) => {
   Log.findOne({_id}).then(data => {
     data.log.push({
       duration,
-      date,
+      date: dateFormat(date),
       description,
     });
     data.count++;
@@ -107,20 +107,19 @@ app.get('/api/users/:_id/logs', (req, res) => {
       to = parsedQuery.to, limit = parsedQuery.limit;
       let dataToSend = {}
       if(from){
-        data.log = data.log.filter((log) => {
-          return (from <= log.date);
-        });
+        data.log = data.log.filter((log) => (from <= log.date));
         dataToSend.from = new Date(from).toDateString();
       } 
       if(to) {
-        data.log = data.log.filter((log) => {
-          return (log.date <= to);
-        });
+        data.log = data.log.filter((log) => (log.date <= to));
         dataToSend['to'] = new Date(to).toDateString();
       }
       if(limit) {
         data.log = data.log.slice(0, limit);
       }
+      data.log.forEach(log => {
+        log.date = new Date(log.date).toDateString();
+      });
       dataToSend['count'] = data.log.length;
       dataToSend = {
         _id,
@@ -130,8 +129,12 @@ app.get('/api/users/:_id/logs', (req, res) => {
       }
       console.log(dataToSend);
       res.status(200).json(dataToSend);
-    } else 
+    } else {
+      data.log.forEach(log => {
+        log.date = new Date(log.date).toDateString();
+      });
       res.status(200).json(data);
+    }
   }).catch(err => {
     res.status(400).json({error: err});
     console.error(err);
