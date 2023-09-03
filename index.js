@@ -103,18 +103,18 @@ app.get('/api/users/:_id/logs', (req, res) => {
   console.log(parsedQuery);
   Log.findById(_id).then(data => {
     if(parsedQuery.from) {
-      const from = new Date(parsedQuery.from), 
-      to = new Date(parsedQuery.to), limit = parsedQuery.limit;
-      console.log(dateFormat(from), dateFormat(new Date()), dateFormat(to))
+      const from = parsedQuery.from, 
+      to = parsedQuery.to, limit = parsedQuery.limit;
+      console.log(from, dateFormat(new Date()), to)
       data.log = data.log.filter((log) => {
         let logDate = dateFormat(new Date(log.date));
-        return (dateFormat(from) <= logDate) && (logDate <= dateFormat(to))
+        return (from <= logDate) && (logDate <= to);
       }).slice(0, limit);
       data = {
         _id,
         username: data.username,
-        from: from.toDateString(),
-        to: to.toDateString(),
+        from: new Date(from).toDateString(),
+        to: new Date(to).toDateString(),
         count: data.log.length,
         log: data.log
       }
