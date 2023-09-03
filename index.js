@@ -84,7 +84,13 @@ app.post('/api/users/:_id/exercises', (req, res) => {
     });
     data.count++;
     data.save();
-    res.status(200).send(data);
+    res.status(200).json({
+      _id,
+      username: data.username,
+      date: dateString,
+      duration,
+      description
+    });
   }).catch(err => {
     console.error(err);
     res.status(400).json({error: err});
@@ -103,6 +109,13 @@ app.get('/api/users/:_id/logs', (req, res) => {
         let logDate = dateFormat(new Date(log.date));
         return (dateFormat(from) <= logDate) && (logDate <= dateFormat(to))
       }).slice(0, limit);
+      data = {
+        _id,
+        username: data.username,
+        from: parsedQuery.from,
+        to: parsedQuery.to,
+        count: data.log.length
+      }
       res.status(200).json(data)
     } else 
       res.status(200).json(data);
